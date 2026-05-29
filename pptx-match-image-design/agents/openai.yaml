@@ -1,0 +1,7 @@
+interface:
+  display_name: "PPT按图修可编辑版"
+  short_description: "参考纯图PPT设计，调整可编辑PPT的文本框和版式。"
+  default_prompt: "Use $pptx-match-image-design to adjust my editable PPTX so its editable text boxes and shapes match the full-page image reference design."
+
+policy:
+  allow_implicit_invocation: true

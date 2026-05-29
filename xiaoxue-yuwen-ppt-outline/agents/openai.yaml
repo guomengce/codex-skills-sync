@@ -1,0 +1,7 @@
+interface:
+  display_name: "小学语文PPT大纲"
+  short_description: "自动检索课文资料夹，生成文本框大纲和背景图提示词。"
+  default_prompt: "Use $xiaoxue-yuwen-ppt-outline to find the lesson materials under D:\\項目\\999 program\\yuwen-ppt and generate paired TXT files: an editable PPT textbox outline and matching background-image prompts."
+
+policy:
+  allow_implicit_invocation: true
