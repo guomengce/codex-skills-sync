@@ -53,7 +53,7 @@ For a lesson such as `火烧云`, likely files include:
 课文名-透明文字层PPT-无背景无占位.pptx
 课文名-整页设计图.pptx
 课文名-纯图设计版.pptx
-课文名-PPT整页设计图提示词-新版.txt
+课文名-文本+图片大纲.txt
 ```
 
 Prefer the newest editable PPTX and the newest image/reference PPTX unless the user specifies exact files.
@@ -114,14 +114,14 @@ Do not:
    - Ensure key text remains selectable/editable.
    - Export or generate thumbnails if available, then compare with the reference.
 
-6. Save a new PPTX.
-   Use a name that makes the result clear:
+6. Save the revised PPTX.
+   Use the stable output name and overwrite the previous generated editable PPTX if it exists:
 
 ```text
-课文名-可编辑PPT-参考纯图设计修正版.pptx
+课文名-可编辑PPT.pptx
 ```
 
-Never overwrite the user's original editable PPTX unless explicitly requested.
+Do not create parallel files such as `修正版`, `新版`, `-2`, or date-stamped variants unless the user explicitly asks for archival versions. If a temporary working copy is needed during editing, delete it after the final PPTX is written.
 
 ## Matching Heuristics
 
