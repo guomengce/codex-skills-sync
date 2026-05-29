@@ -5,6 +5,18 @@ description: Adjust an editable PPTX to visually match a non-editable full-page 
 
 # PPTX Match Image Design
 
+## Skill Sync Rule
+
+If this skill or another skill in the sync repository is modified, automatically run the following from the sync repository after edits are complete:
+
+```text
+git add .
+git commit -m "update skills"
+git push
+```
+
+Only do this when skill files themselves changed. Do not commit ordinary lesson outputs such as `.txt`, `.pptx`, images, or temporary files from lesson folders.
+
 ## Goal
 
 Transform an editable PPTX from a rough text-layer deck into a polished editable deck by using a pure-image PPT or page images as the visual reference.

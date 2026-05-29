@@ -5,6 +5,18 @@ description: Generate three coordinated TXT files for a specific elementary Chin
 
 # 小学语文课文PPT三文档大纲
 
+## Skill同步规则
+
+如果本 skill 或同步仓库中的其他 skill 文件发生修改，改完后自动在同步仓库执行：
+
+```text
+git add .
+git commit -m "update skills"
+git push
+```
+
+仅在 skill 文件本身有改动时执行。生成或修改课文资料夹中的 `.txt`、`.pptx`、图片等教学产物时，不触发 skill 仓库提交。
+
 ## 固定资料库
 
 默认资料库路径：
