@@ -1,0 +1,7 @@
+interface:
+  display_name: "小学语文PPT一体化"
+  short_description: "按课文资料生成三份配套PPT大纲"
+  default_prompt: "Use $yuwen-ppt-skill to find the lesson folder under D:\\項目\\999 program\\yuwen-ppt and generate the three coordinated TXT outlines for 《火烧云》."
+
+policy:
+  allow_implicit_invocation: true
