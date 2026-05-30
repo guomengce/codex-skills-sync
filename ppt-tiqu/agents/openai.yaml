@@ -1,0 +1,5 @@
+﻿interface:
+  display_name: "ppt-tiqu"
+  short_description: "逐页提取 PPTX/PDF 文本并生成同行参考 TXT 大纲"
+  default_prompt: "使用 $ppt-tiqu 逐页提取我提供的同行 PPTX 或 PDF，生成保留页面边界的 TXT 参考大纲。"
+

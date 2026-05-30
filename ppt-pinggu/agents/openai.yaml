@@ -1,0 +1,4 @@
+interface:
+  display_name: "小学语文课件评估"
+  short_description: "按课文名称自动定位本地资料并比较两份小学语文课件大纲教学质量"
+  default_prompt: "Use $ppt-pinggu to evaluate and compare the two local PPT outlines for 《漏》."
