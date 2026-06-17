@@ -1,6 +1,6 @@
 ---
 name: yuwen-ppt-0615
-description: Use when a primary school Chinese teacher provides Chinese lesson materials such as textbook text, after-class questions, teacher reference, teaching design, or an approved PPT outline, and wants a Markdown PPT outline, three coordinated Markdown planning documents, an editable text-layer PPTX, AI-generated no-text background images, or image-plus-text reference prompts.
+description: Use when a primary school Chinese teacher provides Chinese lesson materials such as textbook text, after-class questions, teacher reference, teaching design, or an approved PPT outline, and wants a Markdown PPT outline, coordinated Markdown planning documents, a copy-helper HTML, an editable text-layer PPTX, AI-generated no-text background images, reference PPTX workflows, or editable PPT refinement.
 ---
 
 # yuwen-ppt-0615
@@ -9,7 +9,7 @@ This skill supports a review-first elementary Chinese PPT workflow.
 
 Default lesson root:
 
-`D:\項目\999 program\yuwen-ppt`
+`D:\项目\999 program\yuwen-ppt`
 
 Use the existing grade / volume / unit / lesson folder structure. Do not create duplicate lesson folders with slightly different names unless the user explicitly asks.
 
@@ -17,17 +17,20 @@ Use the existing grade / volume / unit / lesson folder structure. Do not create 
 
 Follow this workflow by default:
 
-1. The user provides lesson source materials:课文原文、课后题、教参、教学指导与设计, or similar materials.
+1. The user provides lesson source materials: 课文原文、课后题、教参、教学指导与设计, or similar materials.
 2. Generate `00.PPT大纲.md` first as a human-reviewable Markdown outline.
-3. Stop for user review. Do not generate `01/02/03` until the user approves or asks to continue.
-4. After approval, use `00.PPT大纲.md` as the source of truth and generate:
-   - `01.PPT文本.md` for Codex internal editable text-layer production
-   - `02.背景图提示词.md` for Codex internal no-text background image generation
-   - `03.图文合成提示词.md` for the user's browser workflow to add text and reference styling on top of the already-generated `pic_0x.png` backgrounds
-5. When the user asks for the next production stage, generate:
-   - `04.PPT文本层.pptx` from `01.PPT文本.md` using the pptx skill
-   - no-text background images from `02.背景图提示词.md` using image-gen, saved as `pic_01.png`, `pic_02.png`, ...
-6. Leave `03.图文合成提示词.md` for the user's browser workflow to generate image-plus-text reference PPTX or reference pages by reusing the exact `pic_0x.png` backgrounds from step 5. Do not let `03` independently redraw backgrounds that `02` already generated.
+3. Stop for user review. Do not generate stage-2 production files until the user approves or asks to continue.
+4. Stage 2: After approval, use `00.PPT大纲.md` as the source of truth and generate:
+   - `01.PPT文本.md`
+   - `02.背景图提示词.md`
+   - `03.图文合成提示词.md`
+   - `04.提示词复制助手.html`
+5. Stage 3: When the user asks for the next production stage, generate:
+   - `05.PPT文本层.pptx` from `01.PPT文本.md`
+   - `06` 纯图版 PPTX from `02.背景图提示词.md` by first generating no-text backgrounds and then assembling them into a pure-image deck
+   - `07` 图文版参考 PPTX from `02/03/04`, reusing the exact `pic_0x.png` backgrounds and the copy-helper workflow
+   - `08` 可编辑 PPTX by merging `05` and `06` as the first editable combined version
+6. Stage 4: When the user asks to refine the editable PPTX, compare `06` against `08`, then revise `08` so the editable version more closely matches the pure-image visual standard while remaining genuinely editable.
 
 Do not generate lesson plans, worksheets, teacher scripts, or final merged decks unless the user explicitly asks.
 
@@ -40,16 +43,16 @@ Use Markdown for reviewable planning files:
 01.PPT文本.md
 02.背景图提示词.md
 03.图文合成提示词.md
-04.PPT文本层.pptx
+04.提示词复制助手.html
+05.PPT文本层.pptx
 pic_01.png, pic_02.png, ...
-06.提示词复制助手.html
 ```
 
 Legacy `.txt` files may exist from older runs. Prefer the `.md` files. If the user asks to clean old txt files, delete only obsolete generated txt planning files after the Markdown files are created.
 
 ## Stage 0: Generate Review Outline
 
-When the user provides课文原文、课后题、教参、教学设计与指导, generate `00.PPT大纲.md`.
+When the user provides 课文原文、课后题、教参、教学设计与指导, generate `00.PPT大纲.md`.
 
 ### Outline Principles
 
@@ -80,7 +83,7 @@ Use this exact page block format:
 
 ### 第一课时：...
 
-## 第 1 页｜页面标题
+## 第1页｜页面标题
 
 **版面视觉**
 
@@ -96,7 +99,7 @@ Describe the visual composition, style, subject placement, and text-safe area in
 
 Rules:
 
-- Use `## 第 X 页｜页面标题` for every page.
+- Use `## 第X页｜页面标题` for every page.
 - Use only two required fields per page: `**版面视觉**` and `**展示文本**`.
 - Do not add routine fields such as `类型`、`课时`、`教学重点`、`课堂任务`、`备注`.
 - Put student-facing questions and activity wording inside `展示文本` if they are actually shown on the slide.
@@ -104,13 +107,14 @@ Rules:
 - Avoid using `【】` as structural markers. Keep Markdown hierarchy clear.
 - Do not include interaction commands such as `点击`、`拖拽`、`飞入`、`弹出` unless the user explicitly wants animation planning.
 
-## Stage 1: Generate Three Markdown Planning Documents
+## Stage 1: Generate Planning Documents and Copy Helper
 
 After the user approves `00.PPT大纲.md`, generate exactly these files:
 
 1. `01.PPT文本.md`
 2. `02.背景图提示词.md`
 3. `03.图文合成提示词.md`
+4. `04.提示词复制助手.html`
 
 Use `00.PPT大纲.md` as the source of truth.
 
@@ -119,9 +123,9 @@ Role split:
 - `01.PPT文本.md` and `02.背景图提示词.md` are internal production inputs for Codex. The user normally does not review them.
 - `03.图文合成提示词.md` is user-facing. It should be clean, readable, and suitable for browser-based image-plus-text composition on top of already-generated `pic_0x.png` backgrounds.
 - To avoid subtle drift between `02` and `03`, `02` is the only stage allowed to generate backgrounds. `03` must not independently redraw or redesign the background; it must reuse the exact `pic_0x.png` image for that page as the composition base.
-- After the user confirms the three Markdown prompt files, generate `06.提示词复制助手.html` as a local browser helper for copying long per-page prompts. It must include separate tabs for `02 纯背景版` and `03 图文合成版`, because the user usually generates all no-text background images first and all image-plus-text reference pages afterward.
+- Generate `04.提示词复制助手.html` in the same stage as `01/02/03` by default, unless the user explicitly wants to delay it. It must include separate tabs for `02 纯背景版` and `03 图文合成版`, because the user usually generates all no-text background images first and all image-plus-text reference pages afterward.
 - The final merged editable PPTX from `01 + 02` and the image-plus-text reference PPTX from `03` must be near-identical in page composition, shared background image, text placement, visual hierarchy, and major layout elements.
-- Once the user has used `03.图文合成提示词.md` to generate a reference PPTX, treat that version as frozen. Do not rewrite `02` or `03` layout/background rules afterward unless the user explicitly decides to regenerate the reference PPTX. If a mismatch is discovered, align `01/04/05` to the already-used `03` reference version rather than changing `03`.
+- Once the user has used `03.图文合成提示词.md` to generate a reference PPTX, treat that version as frozen. Do not rewrite `02` or `03` layout/background rules afterward unless the user explicitly decides to regenerate the reference PPTX. If a mismatch is discovered, align later editable outputs to the already-used `03` reference version rather than changing `03`.
 
 Preserve:
 
@@ -166,7 +170,7 @@ Purpose: editable PPT text-layer construction spec. `01 + 02` must be able to co
 Use this page block:
 
 ```md
-## 第 X 页｜页面标题
+## 第X页｜页面标题
 
 **可编辑展示文本**
 
@@ -178,8 +182,8 @@ Use this page block:
 - 文字安全区：...
 - 页面组件总数：...
 - 组件清单：
-  - 组件 1：类型=标题文本框；位置=x%, y%；尺寸=w%, h%；样式=字体、字号、颜色、对齐、填充、边框、圆角、透明度；内容=...
-  - 组件 2：类型=正文文本框 / 词卡 / 田字格 / 箭头 / 标注 / 评价区等；位置=...；尺寸=...；样式=...；内容=...
+  - 组件1：类型=标题文本框；位置=x%, y%, w%, h%；样式=字体、字号、颜色、对齐、填充、边框、圆角、透明度；内容=...
+  - 组件2：类型=正文文本框 / 词卡 / 田字格 / 箭头 / 标注 / 评价区等；位置=...；尺寸=...；样式=...；内容=...
 - 排布关系：组件之间的上下左右关系、间距、对齐线、分栏或网格规则
 - 文本层级：标题 / 正文 / 词卡 / 问题 / 评价等如何分组
 
@@ -214,7 +218,7 @@ Purpose: no-text background image prompts.
 Use this page block:
 
 ```md
-## 第 X 页｜页面标题
+## 第X页｜页面标题
 
 **背景图提示词**
 
@@ -251,7 +255,7 @@ Purpose: image-plus-text composition prompts for the user's browser workflow, us
 Use this page block:
 
 ```md
-## 第 X 页｜页面标题
+## 第X页｜页面标题
 
 **图文合成提示词**
 
@@ -284,19 +288,19 @@ Rules:
 - Make `03` user-friendly: the user should be able to copy a page prompt, upload the corresponding `pic_0x.png`, and generate an image-plus-text reference page that closely matches the future merged editable PPTX.
 - Every browser prompt must explicitly request the same bright, fresh, warm, clean, child-friendly grade-2 elementary Chinese lesson style and forbid dark or gloomy styles.
 
-### `06.提示词复制助手.html` Format
+### `04.提示词复制助手.html` Format
 
 Purpose: local browser helper for one-click copying long prompts.
 
 Rules:
 
-- Generate it only after the user confirms `01.PPT文本.md`, `02.背景图提示词.md`, and `03.图文合成提示词.md`, or explicitly asks for the copy helper.
+- Generate it together with `01.PPT文本.md`, `02.背景图提示词.md`, and `03.图文合成提示词.md` by default after the outline is approved. Save it as `04.提示词复制助手.html`. The user may also explicitly ask for the copy helper earlier or later.
 - Use one static HTML file in the lesson folder. It must work by opening the file directly in a browser; do not require a dev server.
 - Do not show the lesson title or课文名 in the page title or visible header. Use a generic title such as `提示词复制助手`.
 - Provide two clearly separated tabs:
   - `02 纯背景版`: one card per page, copying the complete page prompt from `02`
   - `03 图文合成版`: one card per page, copying the complete page prompt from `03`
-- Each page row must show only `第 X 页｜页面标题` on the left and a one-click copy button on the right. Do not visibly display the prompt body, because the Markdown text has already been confirmed.
+- Each page row must show only `第X页｜页面标题` on the left and a one-click copy button on the right. Do not visibly display the prompt body, because the Markdown text has already been confirmed.
 - Keep page order and page titles identical to the Markdown files.
 - The helper is only a copying UI. It must not change, summarize, rewrite, or merge prompt content.
 
@@ -304,9 +308,9 @@ Rules:
 
 ### Generate Editable PPTX
 
-When the user asks, use the pptx skill and `01.PPT文本.md` to generate:
+When the user asks for stage 3 production, use the pptx skill and `01.PPT文本.md` to generate:
 
-`04.PPT文本层.pptx`
+`05.PPT文本层.pptx`
 
 Rules:
 
@@ -317,13 +321,13 @@ Rules:
 - For each slide, create exactly the component count and component types specified in `01` unless a PowerPoint limitation requires a documented adjustment.
 - Convert `01` percentage coordinates directly into PPTX positions. Keep each component inside its declared `x/y/w/h` box.
 - Preserve each component's declared fill color, border color, border width, opacity, font size, font color, bold/regular emphasis, alignment, and spacing as closely as PPTX allows.
-- The resulting `04.PPT文本层.pptx` should look incomplete by itself, because backgrounds are absent, but its editable text components must align with the no-text backgrounds generated from `02`.
-- Before generating `04`, check whether `01` contains generic repeated component instructions. If it does, revise `01` first into a page-specific executable text-layer spec.
-- After generating `04`, create visual thumbnails to verify page-specific component count, placement, hierarchy, and text fit. Regenerate if pages look like one repeated template or if components do not follow `01`.
+- The resulting `05.PPT文本层.pptx` should look incomplete by itself, because backgrounds are absent, but its editable text components must align with the no-text backgrounds generated from `02`.
+- Before generating `05`, check whether `01` contains generic repeated component instructions. If it does, revise `01` first into a page-specific executable text-layer spec.
+- After generating `05`, create visual thumbnails to verify page-specific component count, placement, hierarchy, and text fit. Regenerate if pages look like one repeated template or if components do not follow `01`.
 
-### Generate No-Text Background Images
+### Generate Pure-Image and Reference Deck Inputs
 
-When the user asks, use image-gen and `02.背景图提示词.md`.
+When the user asks for stage 3 production, use image-gen and `02.背景图提示词.md`.
 
 Rules:
 
@@ -332,19 +336,22 @@ Rules:
 - Do not overwrite existing `pic_*.png` unless the user explicitly asks.
 - Do not generate text, pinyin, labels, watermarks, logos, or page numbers inside images.
 - Treat the generated `pic_0x.png` files as the only background standard for later `03` image-plus-text composition prompts and later editable PPTX refinement.
+- Assemble those background images into the user's pure-image PPTX workflow result as `06`.
+- Let the user use `02/03/04` to produce the image-plus-text reference PPTX as `07`.
+- Merge `05` and `06` into the first editable combined PPTX as `08`.
 
-### Refine Editable PPTX Against Reference PPTX
+### Refine Editable PPTX Against Pure-Image Standard
 
-When the user has already generated an image-plus-text reference PPTX from `03`, and wants the editable PPTX to visually match it more closely, create or refine:
+When the user enters stage 4 and wants the editable PPTX refined, compare `06` and `08`, then create or refine:
 
-`05可编辑.pptx`
+`08可编辑.pptx`
 
 Rules:
 
-- `05` must remain genuinely editable: text, text boxes, title groups, word cards, labels, and panel elements must stay as editable PPT objects.
+- `08` must remain genuinely editable: text, text boxes, title groups, word cards, labels, and panel elements must stay as editable PPT objects.
 - Never fake the result by replacing a page with one full image that already contains text.
-- Use the user's image-plus-text reference PPTX from `03` as the visual standard for layout, spacing, font scale, hierarchy, emphasis colors, and panel arrangement.
-- Keep the no-text background images from `02` as the background layer; refine only the editable foreground text-layer objects and visible UI-like page components.
+- Use `06` as the main visual standard for layout, spacing, background alignment, and overall page composition. If `07` exists and the user wants it considered too, use it as a secondary style reference for text presentation.
+- Keep the no-text background images from `02` / `06` as the background layer; refine only the editable foreground text-layer objects and visible UI-like page components inside `08`.
 - If needed, refine in batches, such as the first 5 pages, the first period, or a specific module, instead of requiring the whole deck at once.
 - Once the user says a page design is locked, do not redesign it later; only make closer alignment edits.
 
